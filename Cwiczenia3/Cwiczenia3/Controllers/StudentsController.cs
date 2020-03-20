@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Cwiczenia3.DAL;
 using Cwiczenia3.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,10 +12,23 @@ namespace Cwiczenia3.Controllers
     [ApiController]
     public class StudentsController : ControllerBase
     {
-        [HttpGet]
-        public string GetStudents(string orderBy)
+        private readonly IDbService _dbService;
+        
+        public StudentsController(IDbService dbService)
         {
-            return $"Jan, Anna, Katarzyna sortowanie={orderBy}";
+            _dbService = dbService;
+        }
+        
+        //[HttpGet]
+        //public string GetStudents(string orderBy)
+        //{
+        //    return $"Jan, Anna, Katarzyna sortowanie={orderBy}";
+        //}
+
+        [HttpGet]
+        public IActionResult GetStudents()
+        {
+            return Ok(_dbService.GetStudents());
         }
 
         [HttpGet("{id}")]
