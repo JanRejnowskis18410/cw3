@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 using Cwiczenia3.DAL;
@@ -13,6 +14,7 @@ namespace Cwiczenia3.Controllers
     public class StudentsController : ControllerBase
     {
         private readonly IDbService _dbService;
+        private String ConnString = "Data Source=db-mssql;Initial Catalog=s18410;Integrated Security=true";
         
         public StudentsController(IDbService dbService)
         {
@@ -28,7 +30,26 @@ namespace Cwiczenia3.Controllers
         [HttpGet]
         public IActionResult GetStudents()
         {
-            return Ok(_dbService.GetStudents());
+            var result = new List<Student>();
+
+            using (SqlConnection con = new SqlConnection(ConnString))
+            using (SqlCommand com = new SqlCommand())   
+            {
+                com.Connection = con;
+                com.CommandText = "SELECT FirstName, LastName, BirthDate, Name, Semester FROM Student JOIN Enrollment ON Student.IdEnrollment = Enrollment.IdEnrollment JOIN Studies ON Enrollment.IdStudy = Studies.IdStudy";
+
+                con.Open();
+                SqlDataReader dr = com.ExecuteReader();
+                while(dr.Read())
+                {
+                    var st = new Student();
+                    st.FirstName = dr["FirstName"].ToString();
+                    st.LastName = dr["LastName"].ToString();
+                    
+                    result.Add(st);
+                }
+            }
+            return Ok(result);
         }
 
         [HttpGet("{id}")]
