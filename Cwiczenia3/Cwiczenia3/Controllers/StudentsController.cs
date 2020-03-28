@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Threading.Tasks;
 using Cwiczenia3.DAL;
 using Cwiczenia3.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -20,12 +18,6 @@ namespace Cwiczenia3.Controllers
         {
             _dbService = dbService;
         }
-        
-        //[HttpGet]
-        //public string GetStudents(string orderBy)
-        //{
-        //    return $"Jan, Anna, Katarzyna sortowanie={orderBy}";
-        //}
 
         [HttpGet]
         public IActionResult GetStudents()
@@ -45,6 +37,9 @@ namespace Cwiczenia3.Controllers
                     var st = new Student();
                     st.FirstName = dr["FirstName"].ToString();
                     st.LastName = dr["LastName"].ToString();
+                    st.BirthDate = DateTime.Parse(dr["BirthDate"].ToString());
+                    st.StudiesName = dr["Name"].ToString();
+                    st.Semester = Int32.Parse(dr["Semester"].ToString());
                     
                     result.Add(st);
                 }
@@ -53,17 +48,35 @@ namespace Cwiczenia3.Controllers
         }
 
         [HttpGet("{id}")]
-        public IActionResult GetStudent(int id)
+        public IActionResult GetStudentEnrollment(int id)
         {
-            if(id == 1)
+            var result = new Enrollment();
+            using (SqlConnection con = new SqlConnection(ConnString))
+            using (SqlCommand com = new SqlCommand())
             {
-                return Ok("Kowalski");
-            } else if (id == 2)
-            {
-                return Ok("Malewski");
-            }
+                com.Connection = con;
+                com.CommandText = "select Enrollment.IdEnrollment, Semester, IdStudy, StartDate from Enrollment join Student on Student.IdEnrollment = Enrollment.IdEnrollment WHERE IndexNumber=@id";
 
-            return NotFound("Nie znaleziono studenta");
+                /*
+                SqlParameter par = new SqlParameter();
+                par.Value = id;
+                par.ParameterName = "id";
+                com.Parameters.Add(par);
+                */
+
+                com.Parameters.AddWithValue("id", id);
+
+                con.Open();
+                SqlDataReader dr = com.ExecuteReader();
+                while (dr.Read())
+                {
+                    result.IdEnrollment = Int32.Parse(dr["IdEnrollment"].ToString());
+                    result.Semester = Int32.Parse(dr["Semester"].ToString());
+                    result.IdStudy = Int32.Parse(dr["IdStudy"].ToString());
+                    result.StartDate = DateTime.Parse(dr["StartDate"].ToString());
+                }
+            }
+            return Ok(result);
         }
 
         [HttpPost]
