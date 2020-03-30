@@ -79,15 +79,6 @@ namespace Cwiczenia3.Controllers
             return Ok(result);
         }
 
-        [HttpPost]
-        public IActionResult CreateStudent(Student student)
-        {
-            //... add to database
-            //... generating index number
-            student.IndexNumber = $"s{new Random().Next(1, 20000)}";
-            return Ok(student);
-        }
-
         [HttpPut("{id}")]
         public IActionResult UpdateStudents()
         {
