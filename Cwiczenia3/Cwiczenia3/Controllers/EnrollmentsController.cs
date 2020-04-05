@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
+using Cwiczenia3.DTOs;
 using Cwiczenia3.Models;
-using Microsoft.AspNetCore.Http;
+using Cwiczenia3.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Cwiczenia3.Controllers
@@ -12,26 +14,19 @@ namespace Cwiczenia3.Controllers
     [ApiController]
     public class EnrollmentsController : ControllerBase
     {
+        private static String ConString = "Data Source=db-mssql;Initial Catalog=s18410;Integrated Security=True";
+        private IStudentsDbService service = new Sql_ServerDbService(ConString);
+
         [HttpPost]
-        public IActionResult CreateStudent(Student student)
+        public IActionResult EnrollStudent(EnrollStudentRequest request)
         {
-            //... add to database
-            //... generating index number
-            //student.IndexNumber = $"s{new Random().Next(1, 20000)}";
-            //return Ok(student);
-            //if (String.IsNullOrEmpty(student.IndexNumber) || )
-            if (String.IsNullOrEmpty(student.IndexNumber))
-            {
-                return NotFound("Field IndexNumber not found!");
-            } else if (String.IsNullOrEmpty(student.LastName))
-            {
-                return NotFound("Field LastName not found!");
-            } else if (String.IsNullOrEmpty(student.StudiesName))
-            {
-                return NotFound("Field StudiesName not found!");
-            }
-            else
-                return Ok(student.IndexNumber);
+            return service.EnrollStudent(request);
+        }
+
+        [HttpPost("promotions")]
+        public IActionResult PromoteStudent(PromoteStudentRequest request)
+        {
+            return service.PromoteStudent(request);
         }
     }
 }
