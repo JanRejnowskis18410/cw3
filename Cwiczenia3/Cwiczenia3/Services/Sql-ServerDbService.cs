@@ -11,14 +11,9 @@ namespace Cwiczenia3.Services
 {
     public class Sql_ServerDbService : IStudentsDbService
     {
-        public string ConString { get; set; }
+        private const string ConString = "Data Source=db-mssql;Initial Catalog=s18410;Integrated Security=True";
 
-        public Sql_ServerDbService(string ConString)
-        {
-            this.ConString = ConString;
-        }
-
-        public IActionResult EnrollStudent(EnrollStudentRequest request)
+        public Enrollment EnrollStudent(EnrollStudentRequest request)
         {
             Enrollment result;
             ObjectResult msg;
@@ -40,9 +35,7 @@ namespace Cwiczenia3.Services
                     {
                         dr.Close();
                         tran.Rollback();
-                        msg = new ObjectResult("Studia o podanej nazwie nie istnieją w bazie danych!");
-                        msg.StatusCode = 400;
-                        return msg;
+                        throw new Exception("Studia o podanej nazwie nie istnieją w bazie danych!");
                     }
                     int idstudies = (int)dr["IdStudy"];
                     dr.Close();
@@ -54,9 +47,7 @@ namespace Cwiczenia3.Services
                     {
                         dr.Close();
                         tran.Rollback();
-                        msg = new ObjectResult("Student o podanym indeksie już istnieje w bazie danych!");
-                        msg.StatusCode = 400;
-                        return msg;
+                        throw new Exception("Student o podanym indeksie już istnieje w bazie danych!");
                     }
                     dr.Close();
 
@@ -92,9 +83,7 @@ namespace Cwiczenia3.Services
                 catch (SqlException exc)
                 {
                     tran.Rollback();
-                    msg = new ObjectResult("Nie udało się przeprowadzić operacji! Błąd w bazie danych:\n" + exc);
-                    msg.StatusCode = 400;
-                    return msg;
+                    throw new Exception("Nie udało się przeprowadzić operacji! Błąd w bazie danych:\n" + exc);
                 };
 
                 result = new Enrollment();
@@ -108,12 +97,10 @@ namespace Cwiczenia3.Services
                     result.StartDate = DateTime.Parse(dr["StartDate"].ToString());
                 }
             }
-            msg = new ObjectResult(result);
-            msg.StatusCode = 201;
-            return msg;
+            return result;
         }
 
-        public IActionResult PromoteStudent(PromoteStudentRequest request)
+        public Enrollment PromoteStudent(PromoteStudentRequest request)
         {
             var Studies = request.Studies;
             var Semester = request.Semester;
@@ -132,9 +119,7 @@ namespace Cwiczenia3.Services
                 if (!dr.Read())
                 {
                     dr.Close();
-                    msg = new ObjectResult("Studia o podanych parametrach nie istnieją w bazie danych!");
-                    msg.StatusCode = 404;
-                    return msg;
+                    throw new Exception("Studia o podanych parametrach nie istnieją w bazie danych!");
                 }
                 dr.Close();
 
@@ -162,9 +147,37 @@ namespace Cwiczenia3.Services
                     result.StartDate = DateTime.Parse(dr["StartDate"].ToString());
                 }
                 dr.Close();
-                msg = new ObjectResult(result);
-                msg.StatusCode = 201;
-                return msg;
+                return result;
+            }
+        }
+
+        public Student GetStudent(string index)
+        {
+            using (var con = new SqlConnection(ConString))
+            using (var com = new SqlCommand())
+            {
+                com.Connection = con;
+                con.Open();
+                com.CommandText = "SELECT * FROM Student WHERE IndexNumber=@index";
+                com.Parameters.AddWithValue("index", index);
+                var dr = com.ExecuteReader();
+                if (!dr.HasRows)
+                {
+                    return null;
+                } else
+                {
+                    Student student = new Student();
+                    while(dr.Read())
+                    {
+                        student.FirstName = dr["FirstName"].ToString();
+                        student.LastName = dr["LastName"].ToString();
+                        student.IndexNumber = dr["IndexNumber"].ToString();
+                        student.BirthDate = DateTime.Parse(dr["BirthDate"].ToString());
+                        student.IdEnrollment = (int)dr["IdEnrollment"];
+                    }
+                    dr.Close();
+                    return student;
+                }
             }
         }
     }

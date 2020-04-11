@@ -4,6 +4,8 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 using Cwiczenia3.DAL;
+using Cwiczenia3.Middlewares;
+using Cwiczenia3.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -27,22 +29,20 @@ namespace Cwiczenia3
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddScoped<IStudentsDbService, Sql_ServerDbService>();
             services.AddSingleton<IDbService, MockDbService>();
             services.AddControllers();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IStudentsDbService service)
         {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseRouting();
-
-            app.UseAuthorization();
-
+            app.UseMiddleware<LoggingMiddleware>();
             app.Use(async (context, next) =>
             {
                 if (!context.Request.Headers.ContainsKey("Index"))
@@ -54,26 +54,17 @@ namespace Cwiczenia3
 
                 string index = context.Request.Headers["Index"].ToString();
                 //check in db
-
-                String constring = "Data Source=db-mssql;Initial Catalog=s18410;Integrated Security=True";
-                using (var con = new SqlConnection(constring))
-                using (var com = new SqlCommand())
+                if(service.GetStudent(index) == null)
                 {
-                    com.Connection = con;
-                    con.Open();
-                    com.CommandText = "SELECT IndexNumber FROM Student WHERE IndexNumber=@index";
-                    com.Parameters.AddWithValue("index", index);
-                    var dr = com.ExecuteReader();
-                    if (!dr.Read())
-                    {
-                        dr.Close();
-                        context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-                        await context.Response.WriteAsync("Student o podanym indeksie nie istnieje w bazie danych");
-                        return;
-                    }
+                    await context.Response.WriteAsync("Student o podanym indeksie nie istnieje w bazie danych");
+                    return;
                 }
                 await next();
             });
+
+            app.UseRouting();
+
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {

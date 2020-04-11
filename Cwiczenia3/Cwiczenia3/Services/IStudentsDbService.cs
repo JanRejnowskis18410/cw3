@@ -1,4 +1,5 @@
 ﻿using Cwiczenia3.DTOs;
+using Cwiczenia3.Models;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -7,9 +8,10 @@ using System.Threading.Tasks;
 
 namespace Cwiczenia3.Services
 {
-    interface IStudentsDbService
+    public interface IStudentsDbService
     {
-        IActionResult EnrollStudent(EnrollStudentRequest request);
-        IActionResult PromoteStudent(PromoteStudentRequest request);
+        Enrollment EnrollStudent(EnrollStudentRequest request);
+        Enrollment PromoteStudent(PromoteStudentRequest request);
+        Student GetStudent(string index);
     }
 }

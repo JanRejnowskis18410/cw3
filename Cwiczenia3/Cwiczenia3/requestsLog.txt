@@ -1,0 +1,46 @@
+
+/api/enrollments/promotions
+POST
+
+{
+"Studies": "Masarnia",
+"Semester": 1
+}
+/api/enrollments/promotions
+POST
+
+{
+"Studies": "Test",
+"Semester": 1
+}
+/api/enrollments
+POST
+
+{
+"IndexNumber": "s1234",
+"FirstName": "Andrzej",
+"LastName": "Malewski",
+"BirthDate": "1993-01-01",
+"Studies": "IT"
+}
+/api/enrollments
+POST
+
+{
+"IndexNumber": "s1234",
+"FirstName": "Andrzej",
+"LastName": "Malewski",
+"BirthDate": "1993-01-01",
+"Studies": "Informatyka"
+}
+/api/students
+GET
+
+
+/api/enrollments/promotions
+POST
+
+{
+"Studies": "Test",
+"Semester": 1
+}

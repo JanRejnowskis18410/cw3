@@ -14,19 +14,38 @@ namespace Cwiczenia3.Controllers
     [ApiController]
     public class EnrollmentsController : ControllerBase
     {
-        private static String ConString = "Data Source=db-mssql;Initial Catalog=s18410;Integrated Security=True";
-        private IStudentsDbService service = new Sql_ServerDbService(ConString);
+        private IStudentsDbService service;
+
+        public EnrollmentsController(IStudentsDbService service)
+        {
+            this.service = service;
+        }
 
         [HttpPost]
         public IActionResult EnrollStudent(EnrollStudentRequest request)
         {
-            return service.EnrollStudent(request);
+            try
+            {
+                Enrollment result = service.EnrollStudent(request);
+                return Created(nameof(result), result);
+            } catch(Exception e)
+            {
+                return BadRequest(e.Message);
+            }
         }
 
         [HttpPost("promotions")]
         public IActionResult PromoteStudent(PromoteStudentRequest request)
         {
-            return service.PromoteStudent(request);
+            try
+            {
+                Enrollment result = service.PromoteStudent(request);
+                return Created(nameof(result), result);
+            }
+            catch (Exception e)
+            {
+                return NotFound(e);
+            }
         }
     }
 }

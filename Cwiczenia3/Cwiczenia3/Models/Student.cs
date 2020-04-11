@@ -13,5 +13,6 @@ namespace Cwiczenia3.Models
         public DateTime BirthDate { get; set; }
         public string StudiesName { get; set; }
         public int Semester { get; set; }
+        public int IdEnrollment { get; set; }
     }
 }
