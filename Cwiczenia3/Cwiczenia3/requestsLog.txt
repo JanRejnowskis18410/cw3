@@ -44,3 +44,11 @@ POST
 "Studies": "Test",
 "Semester": 1
 }
+/api/students
+GET
+
+
+/favicon.ico
+GET
+
+
