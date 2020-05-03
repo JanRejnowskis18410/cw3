@@ -1,9 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 using Cwiczenia3.DAL;
+using Cwiczenia3.DTOs;
 using Cwiczenia3.Models;
+using Cwiczenia3.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Cwiczenia3.Controllers
 {
@@ -11,15 +19,18 @@ namespace Cwiczenia3.Controllers
     [ApiController]
     public class StudentsController : ControllerBase
     {
-        private readonly IDbService _dbService;
+
+        private IStudentsDbService service;
         private String ConnString = "Data Source=db-mssql;Initial Catalog=s18410;Integrated Security=true";
-        
-        public StudentsController(IDbService dbService)
+        private IConfiguration configuration;
+        public StudentsController(IDbService dbService, IConfiguration configuration, IStudentsDbService service)
         {
-            _dbService = dbService;
+            this.configuration = configuration;
+            this.service = service;
         }
 
         [HttpGet]
+        [Authorize(Roles = "student")]
         public IActionResult GetStudents()
         {
             var result = new List<Student>();
@@ -48,6 +59,7 @@ namespace Cwiczenia3.Controllers
         }
 
         [HttpGet("{id}")]
+        [Authorize]
         public IActionResult GetStudentEnrollment(int id)
         {
             var result = new Enrollment();
@@ -80,15 +92,48 @@ namespace Cwiczenia3.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize]
         public IActionResult UpdateStudents()
         {
             return Ok("Aktualizacja dokończona");
         }
 
         [HttpDelete("{id}")]
+        [Authorize]
         public IActionResult deleteStudents()
         {
             return Ok("Usuwanie ukończone");
+        }
+
+        [HttpPost("login")]
+        public IActionResult Login(StudentLoginRequest request)
+        {
+            var student = service.GetLoggingStudent(request);
+            if (student == null)
+                return Unauthorized("Student o podanym indeksie i haśle nie istnieje w bazie danych!");
+            var claims = new Claim[]
+            {
+                new Claim(ClaimTypes.NameIdentifier, student.IndexNumber),
+                new Claim(ClaimTypes.Name, student.FirstName),
+                new Claim(ClaimTypes.Role, "student")
+            };
+
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["SecretKey"]));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+            var token = new JwtSecurityToken
+            (
+                issuer: "Gakko",
+                audience: "Students",
+                claims: claims,
+                expires: DateTime.Now.AddMinutes(10),
+                signingCredentials: creds
+            );
+            return Ok(new
+            {
+                token = new JwtSecurityTokenHandler().WriteToken(token),
+                refreshToken = Guid.NewGuid()
+            });
         }
     }
 }

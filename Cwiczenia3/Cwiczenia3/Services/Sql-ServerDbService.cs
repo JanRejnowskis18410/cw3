@@ -71,7 +71,7 @@ namespace Cwiczenia3.Services
                     }
                     dr.Close();
 
-                    com.CommandText = "INSERT INTO Student VALUES (@index, @fname, @lname, @birth, @enrollmentid)";
+                    com.CommandText = "INSERT INTO Student VALUES (@index, @fname, @lname, @birth, @enrollmentid, null)";
                     com.Parameters.AddWithValue("fname", request.FirstName);
                     com.Parameters.AddWithValue("lname", request.LastName);
                     com.Parameters.AddWithValue("birth", request.BirthDate);
@@ -168,6 +168,38 @@ namespace Cwiczenia3.Services
                 {
                     Student student = new Student();
                     while(dr.Read())
+                    {
+                        student.FirstName = dr["FirstName"].ToString();
+                        student.LastName = dr["LastName"].ToString();
+                        student.IndexNumber = dr["IndexNumber"].ToString();
+                        student.BirthDate = DateTime.Parse(dr["BirthDate"].ToString());
+                        student.IdEnrollment = (int)dr["IdEnrollment"];
+                    }
+                    dr.Close();
+                    return student;
+                }
+            }
+        }
+
+        public Student GetLoggingStudent(StudentLoginRequest request)
+        {
+            using (var con = new SqlConnection(ConString))
+            using (var com = new SqlCommand())
+            {
+                com.Connection = con;
+                con.Open();
+                com.CommandText = "SELECT * FROM Student WHERE IndexNumber=@index AND Password=@password";
+                com.Parameters.AddWithValue("index", request.IndexNumber);
+                com.Parameters.AddWithValue("password", request.Password);
+                var dr = com.ExecuteReader();
+                if (!dr.HasRows)
+                {
+                    return null;
+                }
+                else
+                {
+                    Student student = new Student();
+                    while (dr.Read())
                     {
                         student.FirstName = dr["FirstName"].ToString();
                         student.LastName = dr["LastName"].ToString();

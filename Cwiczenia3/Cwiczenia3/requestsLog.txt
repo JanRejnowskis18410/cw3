@@ -1,48 +1,134 @@
+/api/students
+GET
 
-/api/enrollments/promotions
-POST
+
+/favicon.ico
+GET
+
+
+/api/students
+GET
 
 {
-"Studies": "Masarnia",
-"Semester": 1
+	"IndexNumber" : "s1234",
+	"Password": "test1234"
 }
-/api/enrollments/promotions
+/api/students/login
 POST
 
 {
-"Studies": "Test",
-"Semester": 1
+	"IndexNumber" : "s1234",
+	"Password": "test1234"
 }
-/api/enrollments
-POST
+/api/students
+GET
 
 {
-"IndexNumber": "s1234",
-"FirstName": "Andrzej",
-"LastName": "Malewski",
-"BirthDate": "1993-01-01",
-"Studies": "IT"
-}
-/api/enrollments
-POST
-
-{
-"IndexNumber": "s1234",
-"FirstName": "Andrzej",
-"LastName": "Malewski",
-"BirthDate": "1993-01-01",
-"Studies": "Informatyka"
+	"IndexNumber" : "s1234",
+	"Password": "test1234"
 }
 /api/students
 GET
 
 
-/api/enrollments/promotions
+/favicon.ico
+GET
+
+
+/api/students/login
 POST
 
 {
-"Studies": "Test",
-"Semester": 1
+	"IndexNumber" : "s1234",
+	"Password": "test1234"
+}
+/api/students
+GET
+
+{
+	"IndexNumber" : "s1234",
+	"Password": "test1234"
+}
+/api/students
+GET
+
+
+/favicon.ico
+GET
+
+
+/api/login
+POST
+
+{
+	"IndexNumber" : "s1234",
+	"Password": "test1234"
+}
+/api/students/login
+POST
+
+{
+	"IndexNumber" : "s1234",
+	"Password": "test1234"
+}
+/api/students
+GET
+
+{
+	"IndexNumber" : "s1234",
+	"Password": "test1234"
+}
+/api/students
+GET
+
+{
+	"IndexNumber" : "s1234",
+	"Password": "test1234"
+}
+/api/students
+GET
+
+
+/favicon.ico
+GET
+
+
+/api/students
+GET
+
+
+/favicon.ico
+GET
+
+
+/api/students/login
+POST
+
+{
+	"IndexNumber" : "s1234",
+	"Password": "test1234"
+}
+/api/students
+GET
+
+{
+	"IndexNumber" : "s1234",
+	"Password": "test1234"
+}
+/api/students
+GET
+
+
+/favicon.ico
+GET
+
+
+/api/students
+GET
+
+{
+	"IndexNumber" : "s1234",
+	"Password": "test1234"
 }
 /api/students
 GET

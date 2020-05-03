@@ -34,7 +34,7 @@ namespace Cwiczenia3.Middlewares
                     context.Request.Body.Position = 0;
                 }
                 string[] lines = { path, method, queryString, bodyStr };
-                System.IO.File.AppendAllLines("requestsLog.txt",lines);
+                File.AppendAllLines("requestsLog.txt",lines);
             }
             if(_next != null) await _next(context);
         }

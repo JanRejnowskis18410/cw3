@@ -13,5 +13,6 @@ namespace Cwiczenia3.Services
         Enrollment EnrollStudent(EnrollStudentRequest request);
         Enrollment PromoteStudent(PromoteStudentRequest request);
         Student GetStudent(string index);
+        Student GetLoggingStudent(StudentLoginRequest request);
     }
 }
